@@ -45,24 +45,24 @@ const proJson = `
   .split('\n')
   .filter(Boolean);
 
+let model: any = null;
+
 const run = async (props: { onMessage: (message: string) => void }) => {
   // Create text embeddings
   console.time('model-load');
   props.onMessage('正在加载模型...');
-  const model = await (await TextModel.create('gtr-t5-quant')).model;
+  model = (await TextModel.create('sentence-t5-large-quant')).model;
 
   props.onMessage('序列化文档列表...');
   const processed = (await Promise.all(
     proJson
       .map(async (q) => {
-        console.log(q);
         try {
           // @ts-ignore
           return (await model.process(q)) as {
             result: number[];
           };
         } catch (error) {
-          console.log(q);
           return '';
         }
       })
@@ -73,13 +73,14 @@ const run = async (props: { onMessage: (message: string) => void }) => {
 
   props.onMessage('正在初始化数据库...');
   // Index embeddings with voy
-  const data = processed.map(({ result }, i) => ({
-    id: String(i),
-    title: proJson[i],
-    url: proJson[i],
-    embeddings: result,
-  }));
-
+  const data = processed.map(({ result }, i) => {
+    return {
+      id: String(i),
+      title: proJson[i],
+      url: proJson[i],
+      embeddings: result,
+    };
+  });
   console.time('Voy insert');
   const resource = { embeddings: data };
   const { Voy } = await import('voy-search');
@@ -115,7 +116,7 @@ export default function Home() {
     const q = (await model.process(keyword)) as {
       result: Float32Array;
     };
-    setResultList(dataBaseRef.current?.search(q.result, 2).neighbors || []);
+    setResultList(dataBaseRef.current?.search(q.result, 10).neighbors || []);
   };
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -154,7 +155,7 @@ export default function Home() {
             defaultValue="有哪些异常状态？"
             onKeyDown={(e) => {
               if (loading) return;
-              if (e.key === '') {
+              if (e.key === 'Enter') {
                 query(
                   (
                     document.getElementById(

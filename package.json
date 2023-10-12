@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@qdrant/js-client-rest": "^1.6.0",
     "@types/node": "20.5.1",
     "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",

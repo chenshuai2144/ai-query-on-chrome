@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "next dev",
+    "lint": "next lint",
+    "start": "next start"
   },
   "dependencies": {
     "@types/node": "20.5.1",
@@ -18,7 +18,10 @@
     "dayjs": "^1.11.9",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.19",
+    "fetch": "^1.1.0",
+    "glob": "^10.3.10",
     "next": "13.4.19",
+    "node-fetch": "^2.0.0",
     "octokit": "^3.1.1",
     "onnxruntime-web": "^1.15.1",
     "postcss": "8.4.28",

@@ -4,6 +4,7 @@ const prettier = require('prettier');
 const fetch = require('node-fetch');
 const glob = require('glob');
 const { join } = require('path');
+const slash = require('slash2');
 
 const github = new Octokit({
   debug: process.env.NODE_ENV === 'development',
@@ -94,7 +95,7 @@ ${text}
 
 const getAllMdList = (path = '/') => {
   const fileList = glob
-    .globSync(join(__dirname, '..', path + '/**/**/*.md'), {
+    .globSync(slash(join(__dirname, '..', path, '/**/**/*.md')), {
       ignore: ['**/node_modules/**', 'README.md'],
     })
     .map((item) => {
@@ -195,7 +196,7 @@ const prepareData = async () => {
 // prepareData();
 
 const zongjie = async () => {
-  const list = getAllMdList('issue');
+  const list = getAllMdList('issues');
 
   for await (const item of list) {
     console.log(item.path);

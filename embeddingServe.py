@@ -21,13 +21,15 @@ def call_qwen(messages, functions=None):
             model="Qwen", messages=messages, functions=functions
         )
     else:
-        response = openai.ChatCompletion.create(model="Qwen", messages=messages,temperature=1)
+        response = openai.ChatCompletion.create(
+            model="Qwen", messages=messages, temperature=1
+        )
     print(response)
     return response.choices[0].message.content
 
 
 model = FlagModel(
-    "BAAI/bge-base-zh", query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章："
+    "BAAI/bge-large-zh-v1.5", query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章："
 )
 
 client = QdrantClient(url="http://localhost:6333")
@@ -53,7 +55,9 @@ def zongjie():
     messages = [
         {
             "role": "user",
-            "content": "将这段文案总结为一段言简意骇的内容，里面包含所有的信息，但是做了一些精简 \n\n "+query["text"]+" \n\n",
+            "content": "将这段文案总结为一段言简意骇的内容，里面包含所有的信息，但是做了一些精简 \n\n "
+            + query["text"]
+            + " \n\n",
         }
     ]
     return call_qwen(messages)
@@ -61,12 +65,48 @@ def zongjie():
 
 @app.route("/query", methods=["POST"])
 def query():
-    query = request.json
+    query_data = request.json
+
+    if "query" not in query_data:
+        return {"message": "query is required"}
+
+    limit = 10
+    if "limit" in query_data:
+        limit = query_data["limit"]
 
     hits = client.search(
         collection_name="test_collection",
-        query_vector=model.encode(query["text"]).tolist(),
-        limit=10,
+        query_vector=model.encode(query_data["query"]).tolist(),
+        limit=limit,
     )
-    json_string = jsonpickle.encode(hits)
-    return json_string
+    result_list = []
+
+    for hit in hits:
+        result_list.append(hit.model_dump()["payload"])
+
+    return result_list
+
+
+@app.route("/answer", methods=["POST"])
+def answer():
+    query = request.json
+    print(
+        "问题："
+        + query["query"]
+        + "\n"
+        + "可能的原因"
+        + jsonpickle.encode(query["answer"])
+        + "\n\n 请基于以上的内容总结一个回答",
+    )
+    messages = [
+        {
+            "role": "user",
+            "content": "问题："
+            + query["query"]
+            + "\n"
+            + "可能的原因"
+            + jsonpickle.encode(query["answer"])
+            + "\n\n 请基于以上的内容总结一个回答",
+        }
+    ]
+    return call_qwen(messages)

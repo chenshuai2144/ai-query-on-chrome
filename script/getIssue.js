@@ -92,9 +92,9 @@ ${text}
 // getIssue('ant-design', 'pro-components').catch(console.error);
 // getIssue('ant-design', 'ant-design-pro').catch(console.error);
 
-const getAllMdList = () => {
+const getAllMdList = (path = '/') => {
   const fileList = glob
-    .globSync(__dirname + `/../**/**/*.md`, {
+    .globSync(join(__dirname, '..', path + '/**/**/*.md'), {
       ignore: ['**/node_modules/**', 'README.md'],
     })
     .map((item) => {
@@ -157,7 +157,6 @@ const prepareData = async () => {
   let index = 0;
   let subIndex = 1;
   for await (const item of list) {
-    const lines = item.content.split('#');
     const points = [];
     for await (const line of lines) {
       if (line.length < 10) {
@@ -193,4 +192,34 @@ const prepareData = async () => {
   }
 };
 
-prepareData();
+// prepareData();
+
+const zongjie = async () => {
+  const list = getAllMdList('issue');
+
+  for await (const item of list) {
+    console.log(item.path);
+
+    if (!item.content.includes('#')) {
+      continue;
+    }
+    const content = await fetch('http://127.0.0.1:5000/zongjie', {
+      method: 'POST',
+      body: JSON.stringify({
+        text: item.content,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((res) => res.text());
+
+    fs.writeFileSync(
+      join(__dirname, '..', item.path),
+      await prettier.format(content, {
+        filepath: 'foo.md',
+      })
+    );
+  }
+};
+
+zongjie();

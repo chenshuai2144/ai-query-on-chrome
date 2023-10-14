@@ -4,6 +4,7 @@ const prettier = require('prettier');
 const fetch = require('node-fetch');
 const glob = require('glob');
 const { join } = require('path');
+const slash = require('slash2');
 
 const github = new Octokit({
   debug: process.env.NODE_ENV === 'development',
@@ -92,23 +93,77 @@ ${text}
 // getIssue('ant-design', 'pro-components').catch(console.error);
 // getIssue('ant-design', 'ant-design-pro').catch(console.error);
 
-const getAllMdList = () => {
+const pathMap = {
+  'ant-design': 'https://github.com/ant-design/ant-design/blob/master',
+  umijs: 'https://github.com/umijs/umi/blob/master',
+  'ant-design-pro': 'https://github.com/ant-design/ant-design-pro/blob/master',
+  'pro-components': 'https://github.com/ant-design/pro-components/blob/master',
+};
+
+const getAllMdList = (path = '/') => {
   const fileList = glob
-    .globSync(__dirname + `/../**/**/*.md`, {
+    .globSync(slash(join(__dirname, '..', path, '/**/**/*.md')), {
       ignore: ['**/node_modules/**', 'README.md'],
     })
     .map((item) => {
       return item.replace(join(__dirname, '..'), '');
     })
     .map((item) => {
+      const pathList = slash(item).split('/');
+      let path = slash(item);
+      if (pathList[1] === 'issues') {
+        path =
+          'https://github.com/' +
+          pathList[2] +
+          '/' +
+          pathList[3] +
+          '/issues/' +
+          pathList[4].split('.')[0];
+      } else {
+        const repo = pathMap[pathList[1]];
+        if (repo) {
+          path = slash(item).replace('/' + pathList[1], repo);
+        }
+        console.log(slash(item).replace('/' + pathList[1], repo));
+      }
+
       return {
         content: fs.readFileSync(join(__dirname, '..', item), 'utf-8'),
-        path: item,
+        path: path,
       };
     });
   return fileList;
 };
 
+const zongjie = async () => {
+  const list = getAllMdList('issues');
+
+  for await (const item of list) {
+    console.log(item.path);
+
+    if (!item.content.includes('#')) {
+      continue;
+    }
+    const content = await fetch('http://127.0.0.1:5000/zongjie', {
+      method: 'POST',
+      body: JSON.stringify({
+        text: item.content,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((res) => res.text());
+
+    fs.writeFileSync(
+      join(__dirname, '..', item.path),
+      await prettier.format(content, {
+        filepath: 'foo.md',
+      })
+    );
+  }
+};
+
+// zongjie();
 const { QdrantClient } = require('@qdrant/js-client-rest');
 
 // TO connect to Qdrant running locally
@@ -129,8 +184,8 @@ const prepareData = async () => {
 
   await client.createCollection(collectionName, {
     vectors: {
-      size: 768,
-      distance: 'Cosine',
+      size: 1024,
+      distance: 'Euclid',
     },
     optimizers_config: {
       default_segment_number: 2,
@@ -157,8 +212,9 @@ const prepareData = async () => {
   let index = 0;
   let subIndex = 1;
   for await (const item of list) {
-    const lines = item.content.split('#');
     const points = [];
+    const lines = item.content.split('#');
+    console.log(item.path);
     for await (const line of lines) {
       if (line.length < 10) {
         continue;
@@ -185,6 +241,10 @@ const prepareData = async () => {
       });
       subIndex++;
     }
+    if (points.length < 1) {
+      continue;
+    }
+
     await client.upsert(collectionName, {
       points: points,
     });

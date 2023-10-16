@@ -2,7 +2,7 @@ PageHeader组件可以用于突出页面主题，显示与页面相关的重要�
 
 [参考文档](https://github.com/ant-design/pro-components/blob/master/packages/layout/src/components/PageHeader/index.en-US.md
 
-PageHeader位于页容器中，页容器顶部，起到了内容概览和引导页级操作的作用。它由面包屑、标题、页面内容简介、页面级操作等组成。[参考文档](https://github.com/ant-design/pro-components/blob/master/packages/layout/src/components/PageHeader/index.md
+PageHeader位于页容器中，页容器顶部，起到了内容概览和引导页级操作的作用。它由面包屑、标题、页面内容简介、页面级操作等组成。 [参考文档](https://github.com/ant-design/pro-components/blob/master/packages/layout/src/components/PageHeader/index.md
 
 PageContainer组件封装了ant design的PageHeader组件，并增加了tabList和content属性。它依赖Layout的route属性，可以根据当前的路由填入title和breadcrumb。PageContainer支持Tabs和PageHeader的所有属性。[参考文档](https://github.com/ant-design/pro-components/blob/master/packages/layout/src/components/PageContainer/index.md
 

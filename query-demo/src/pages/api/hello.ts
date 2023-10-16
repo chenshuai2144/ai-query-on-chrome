@@ -8,7 +8,7 @@ export const config = {
   runtime: 'edge',
 };
 
-export default async function handler(req) {
+export default async function handler(req: any) {
   if (req.method === 'POST') {
     try {
       const { query } = await req.json();
@@ -30,9 +30,10 @@ export default async function handler(req) {
           {
             role: 'user',
             content: `\n
-"answer":${JSON.stringify(content)}
+问题：${query}
+可能的答案:${JSON.stringify(content)}
 \n
-请基于以上的内容总结一个 md 格式回答，例如：
+请基于以上的内容总结一个得体并且言简意骇的回答，只需要输出回答即可。
             `,
           },
         ],
@@ -61,10 +62,12 @@ export default async function handler(req) {
       return res;
     }
   } else {
-    const res = new Response({
-      status: 405,
-      statusText: 'Method not allowed',
-    });
+    const res = new Response(
+      JSON.stringify({
+        status: 405,
+        statusText: 'Method not allowed',
+      })
+    );
     return res;
   }
 }

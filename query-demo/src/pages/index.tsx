@@ -37,6 +37,15 @@ export default function Home() {
   };
   return (
     <main
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        overflow: 'auto',
+        backgroundImage:
+          "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
+        backgroundSize: '100% 100%',
+      }}
       className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
     >
       <div
@@ -77,7 +86,6 @@ export default function Home() {
       >
         <div
           style={{
-            border: '1px solid #e5e7eb',
             display: 'flex',
             alignItems: 'center',
           }}
@@ -94,8 +102,10 @@ export default function Home() {
             style={{
               padding: 12,
               fontSize: 18,
+              color: 'rgba(0,0,0,0.65)',
               width: '62vw',
               borderRadius: 4,
+              backgroundColor: 'rgba(255,255,255,0.25)',
               outline: 'none',
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
@@ -110,7 +120,7 @@ export default function Home() {
           <button
             style={{
               fontSize: 18,
-              background: '#1890ff',
+              background: 'rgb(9.4%,56.5%,85%)',
               height: 51,
               color: '#fff',
               paddingInline: 32,
@@ -132,8 +142,10 @@ export default function Home() {
               width: 'calc(62vw + 100px)',
               padding: 24,
               marginTop: 24,
-              border: '1px solid #e5e7eb',
+              backdropFilter: 'blur(8px)',
+              backgroundColor: 'rgba(255,255,255,0.25)',
               borderRadius: 4,
+              boxShadow: '0 0 8px rgba(0,0,0,0.15)',
             }}
           >
             {data.content && (
@@ -161,7 +173,7 @@ export default function Home() {
                       <a
                         href={item.url}
                         style={{
-                          color: '#1890ff',
+                          color: 'rgb(9.4%,56.5%,85%)',
                           cursor: 'pointer',
                         }}
                         target="_blank"

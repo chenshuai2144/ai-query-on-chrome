@@ -160,7 +160,7 @@ export default function Home() {
                 <div>
                   <Markdown>{data?.content}</Markdown>
                 </div>
-                <div> 参考文档：</div>
+                <div>参考文档：</div>
                 <div
                   style={{
                     display: 'flex',

@@ -17,38 +17,51 @@ export default async function handler(req: any) {
         method: 'POST',
         body: JSON.stringify({
           query,
-          limit: 10,
+          limit: 5,
         }),
         headers: {
           'Content-Type': 'application/json',
         },
       }).then((res) => res.json());
 
-      const chatData = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo-16k',
-        messages: [
-          {
-            role: 'user',
-            content: `\n
-问题：${query}
-可能的答案:${JSON.stringify(content)}
-\n
-请基于以上的内容总结一个得体并且言简意骇的回答，只需要输出回答即可。
-            `,
-          },
-        ],
-        temperature: 0.5,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-        max_tokens: 2000,
-      });
+      const stream = new ReadableStream({
+        async start(controller) {
+          const chatData = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo-16k',
+            messages: [
+              {
+                role: 'user',
+                content: `\n
+    问题：${query}
+    可能的答案:${JSON.stringify(content)}
+    \n
+    请基于以上的内容总结一个得体并且言简意骇的回答，只需要输出回答即可。
+                `,
+              },
+            ],
+            temperature: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            max_tokens: 2000,
+            stream: true,
+          });
+          const encoder = new TextEncoder();
+          for await (const part of chatData) {
+            controller.enqueue(
+              encoder.encode(part.choices[0]?.delta?.content || '')
+            );
+          }
 
-      return new Response(
-        JSON.stringify({
-          content: chatData.choices?.[0]?.message?.content,
-          document: content,
-        })
-      );
+          // 发送参考链接
+          controller.enqueue(
+            encoder.encode('\n###################' + JSON.stringify(content))
+          );
+          // 完成后，关闭流
+          controller.close();
+        },
+      });
+      // 返回流
+      return new Response(stream);
     } catch (error) {
       const res = new Response(
         JSON.stringify({

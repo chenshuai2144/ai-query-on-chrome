@@ -1,40 +1,67 @@
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Markdown from 'react-markdown';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({
-    content: '',
-    document: [] as { text: string; url: string }[],
-  });
 
-  const fetchData = async (query: string) => {
-    setLoading(true);
-    setData({ content: '', document: [] });
+  const [text, setText] = useState('');
 
-    const msg = await fetch('/api/hello', {
-      method: 'POST',
-      body: JSON.stringify({ query }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((res) => {
-      return res.json();
-    });
-    setData(msg);
-    setLoading(false);
+  const fetchDataStream = async (query: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/hello', {
+        method: 'POST',
+        body: JSON.stringify({ query }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status !== 200) return;
+      const reader = response?.body?.getReader();
+      if (!reader) return;
+
+      const process = ({
+        done,
+        value: chunk,
+      }: ReadableStreamReadResult<Uint8Array>): Promise<
+        ReadableStreamReadResult<Uint8Array>
+      > => {
+        if (done) {
+          setLoading(false);
+          console.log('Stream finished');
+          return Promise.resolve({ done: true, value: new Uint8Array() });
+        }
+        const decodedChunk = new TextDecoder().decode(chunk);
+
+        setText((text) => text + decodedChunk);
+        return reader.read().then((result) => process(result));
+      };
+      await process(await reader.read());
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const query = () => {
+  const query = async () => {
     const query = (document.getElementById('query') as HTMLInputElement).value;
     window.history.pushState({}, '', `?query=${query}`);
     if (!query) return;
-    fetchData(query);
+    await fetchDataStream(query);
   };
+
+  const documentList = useMemo((): {
+    url: string;
+    text: string;
+  }[] => {
+    const json = text.split('###################').at(1);
+    return json ? JSON.parse(json) : [];
+  }, [text]);
+
   return (
     <main
       style={{
@@ -43,7 +70,7 @@ export default function Home() {
         height: '100vh',
         overflow: 'auto',
         backgroundImage:
-          "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
+          "url('https://tailwindcss.com/_next/static/media/hero-dark@90.dba36cdf.jpg')",
         backgroundSize: '100% 100%',
       }}
       className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
@@ -68,7 +95,9 @@ export default function Home() {
           <Image
             src="/vercel.svg"
             alt="Vercel Logo"
-            className="dark:invert"
+            style={{
+              filter: 'invert(1)',
+            }}
             width={100}
             height={24}
             priority
@@ -102,7 +131,7 @@ export default function Home() {
             style={{
               padding: 12,
               fontSize: 18,
-              color: 'rgba(0,0,0,0.65)',
+              color: 'rgba(255,255,255,0.85)',
               width: '62vw',
               borderRadius: 4,
               backgroundColor: 'rgba(255,255,255,0.25)',
@@ -124,6 +153,7 @@ export default function Home() {
               height: 51,
               color: '#fff',
               paddingInline: 32,
+              width: 120,
               borderTopRightRadius: 4,
               borderBottomRightRadius: 4,
             }}
@@ -135,11 +165,11 @@ export default function Home() {
           </button>
         </div>
 
-        {data.content ? (
+        {text ? (
           <div
             className="markdown-body"
             style={{
-              width: 'calc(62vw + 100px)',
+              width: 'calc(62vw + 120px)',
               padding: 24,
               marginTop: 24,
               backdropFilter: 'blur(8px)',
@@ -148,41 +178,46 @@ export default function Home() {
               boxShadow: '0 0 8px rgba(0,0,0,0.15)',
             }}
           >
-            {data.content && (
+            {text && (
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 12,
+                  color: 'rgba(255,255,255,0.85)',
                 }}
               >
                 <div>查询结果：</div>
                 <div>
-                  <Markdown>{data?.content}</Markdown>
+                  <Markdown>{text.split('###################').at(0)}</Markdown>
                 </div>
-                <div>参考文档：</div>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 12,
-                  }}
-                >
-                  {data?.document?.map((item) => (
-                    <div key={item.text}>
-                      <a
-                        href={item.url}
-                        style={{
-                          color: 'rgb(9.4%,56.5%,85%)',
-                          cursor: 'pointer',
-                        }}
-                        target="_blank"
-                      >
-                        {item.url}
-                      </a>
+                {documentList.length ? (
+                  <>
+                    <div>参考文档：</div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 12,
+                      }}
+                    >
+                      {documentList?.map((item) => (
+                        <div key={item.text}>
+                          <a
+                            href={item.url}
+                            style={{
+                              color: 'rgb(9.4%,56.5%,85%)',
+                              cursor: 'pointer',
+                            }}
+                            target="_blank"
+                          >
+                            {item.url}
+                          </a>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </>
+                ) : null}
               </div>
             )}
           </div>

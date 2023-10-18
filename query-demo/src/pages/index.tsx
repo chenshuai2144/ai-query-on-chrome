@@ -13,6 +13,7 @@ export default function Home() {
   const fetchDataStream = async (query: string) => {
     try {
       setLoading(true);
+      setText('');
       const response = await fetch('/api/hello', {
         method: 'POST',
         body: JSON.stringify({ query }),

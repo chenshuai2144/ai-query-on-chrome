@@ -152,7 +152,6 @@ export default function Home() {
               background: 'rgb(9.4%,56.5%,85%)',
               height: 51,
               color: '#fff',
-              paddingInline: 32,
               width: 120,
               borderTopRightRadius: 4,
               borderBottomRightRadius: 4,

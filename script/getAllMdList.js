@@ -40,6 +40,7 @@ const getAllMdList = (path = '/') => {
       return {
         content: fs.readFileSync(join(__dirname, '..', item), 'utf-8'),
         path: path,
+        relayPath: item,
       };
     });
   return fileList;

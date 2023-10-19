@@ -11,6 +11,7 @@ const zongjie = async () => {
     if (!item.content.includes('#')) {
       continue;
     }
+    console.log('正在总结：' + item.relayPath);
     const content = await fetch('http://127.0.0.1:5000/zongjie', {
       method: 'POST',
       body: JSON.stringify({
@@ -22,7 +23,7 @@ const zongjie = async () => {
     }).then((res) => res.text());
 
     fs.writeFileSync(
-      join(__dirname, '..', item.path),
+      join(__dirname, '..', item.relayPath),
       await prettier.format(content, {
         filepath: 'foo.md',
       })

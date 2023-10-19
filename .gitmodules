@@ -7,3 +7,6 @@
 [submodule "umi"]
 	path = umi
 	url = git@github.com:umijs/umi.git
+[submodule "ant-design-pro-site"]
+	path = ant-design-pro-site
+	url = git@github.com:ant-design/ant-design-pro-site.git

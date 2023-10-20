@@ -10,17 +10,22 @@ export default function Home() {
 
   const [text, setText] = useState('');
 
+  const [model, setModel] = useState('openai');
+
   const fetchDataStream = async (query: string) => {
     try {
       setLoading(true);
       setText('');
-      const response = await fetch('/api/hello', {
-        method: 'POST',
-        body: JSON.stringify({ query }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        model === 'openai' ? '/api/hello' : '/api/qwen',
+        {
+          method: 'POST',
+          body: JSON.stringify({ query }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (response.status !== 200) return;
       const reader = response?.body?.getReader();
@@ -114,6 +119,44 @@ export default function Home() {
           flexDirection: 'column',
         }}
       >
+        <div
+          style={{
+            display: 'flex',
+            gap: 32,
+            marginBottom: 24,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 24,
+              cursor: 'pointer',
+              transition: 'all 0.3',
+              opacity: model === 'qwen' ? 1 : 0.5,
+              transform: model === 'qwen' ? 'scale(1.2)' : undefined,
+            }}
+            onClick={() => {
+              setModel('qwen');
+            }}
+          >
+            通义千问
+          </div>
+
+          <div
+            style={{
+              fontSize: 24,
+              cursor: 'pointer',
+              transition: 'all 0.3',
+              opacity: model === 'openai' ? 1 : 0.5,
+              transform: model === 'openai' ? 'scale(1.2)' : undefined,
+            }}
+            onClick={() => {
+              setModel('openai');
+            }}
+          >
+            openai
+          </div>
+        </div>
+
         <div
           style={{
             display: 'flex',

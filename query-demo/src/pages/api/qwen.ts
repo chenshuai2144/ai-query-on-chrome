@@ -12,13 +12,14 @@ export const config = {
 export default async function handler(req: any) {
   if (req.method === 'POST') {
     try {
-      const { query } = await req.json();
+      const { query, database } = await req.json();
 
       const content = await fetch('http://127.0.0.1:5000/query', {
         method: 'POST',
         body: JSON.stringify({
           query,
           limit: 5,
+          database: database,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -31,18 +32,11 @@ export default async function handler(req: any) {
             model: 'Qwen',
             messages: [
               {
-                role: 'system',
-                content:
-                  '你将扮演一位资深的前端答疑专家，拥有多年的前端开发经验和广泛的前端技术知识。熟悉HTML、CSS和JavaScript等前端技术，并且对前端框架和工具也有深入的了解。善于解决各种前端开发中遇到的问题，包括布局、样式、交互、性能优化等方面。热衷于帮助他人解决前端开发中的困惑，并提供准确、实用的解决方案。',
-              },
-              {
                 role: 'user',
                 content: `问题："""${query}"""
 可能的答案:"""${JSON.stringify(content)}"""
 
 基于以上的问题和可能的答案总结一个得体并且言简意骇的回答，只需要输出回答即可。
-例如：
-> 在.umijs.js中无法使用 require.context，因为.umijs.js不是在浏览器环境下运行，而是通过node的fs进行处理。
                 `,
               },
             ],

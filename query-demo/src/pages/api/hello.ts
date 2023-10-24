@@ -11,13 +11,14 @@ export const config = {
 export default async function handler(req: any) {
   if (req.method === 'POST') {
     try {
-      const { query } = await req.json();
+      const { query, database } = await req.json();
 
       const content = await fetch('http://127.0.0.1:5000/query', {
         method: 'POST',
         body: JSON.stringify({
           query,
           limit: 5,
+          database: database,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -29,11 +30,6 @@ export default async function handler(req: any) {
           const chatData = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo-16k',
             messages: [
-              {
-                role: 'assistant',
-                content:
-                  '你将扮演一位资深的前端答疑专家，拥有多年的前端开发经验和广泛的前端技术知识。熟悉HTML、CSS和JavaScript等前端技术，并且对前端框架和工具也有深入的了解。善于解决各种前端开发中遇到的问题，包括布局、样式、交互、性能优化等方面。热衷于帮助他人解决前端开发中的困惑，并提供准确、实用的解决方案。',
-              },
               {
                 role: 'user',
                 content: `\n

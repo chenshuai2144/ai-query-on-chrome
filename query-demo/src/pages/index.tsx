@@ -20,7 +20,12 @@ export default function Home() {
         model === 'openai' ? '/api/hello' : '/api/qwen',
         {
           method: 'POST',
-          body: JSON.stringify({ query }),
+          body: JSON.stringify({
+            query,
+            database: new URLSearchParams(window.location.search).get(
+              'database'
+            ),
+          }),
           headers: {
             'Content-Type': 'application/json',
           },
@@ -55,7 +60,10 @@ export default function Home() {
 
   const query = async () => {
     const query = (document.getElementById('query') as HTMLInputElement).value;
-    window.history.pushState({}, '', `?query=${query}`);
+    const database = new URLSearchParams(window.location.search).get(
+      'database'
+    );
+    window.history.pushState({}, '', `?query=${query}&database=${database}`);
     if (!query) return;
     await fetchDataStream(query);
   };

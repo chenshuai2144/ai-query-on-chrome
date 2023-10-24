@@ -79,12 +79,16 @@ def query():
     if "query" not in query_data:
         return {"message": "query is required"}
 
+    database = query_data["database"]
+    if database is None:
+        database = "test_collection"
+
     limit = 10
     if "limit" in query_data:
         limit = query_data["limit"]
 
     hits = client.search(
-        collection_name="test_collection",
+        collection_name=database,
         query_vector=model.encode(query_data["query"]).tolist(),
         limit=limit,
     )

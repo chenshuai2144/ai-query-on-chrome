@@ -34,7 +34,6 @@ const getAllMdList = (path = '/') => {
         if (repo) {
           path = slash(item).replace('/' + pathList[1], repo);
         }
-        console.log(slash(item).replace('/' + pathList[1], repo));
       }
 
       return {

@@ -52,7 +52,11 @@ export default async function handler(req: any) {
 
           // 发送参考链接
           controller.enqueue(
-            encoder.encode('\n###################' + JSON.stringify(content))
+            encoder
+              .encode(
+                '\n' + content.map((item: any) => `[${item.url}](${item.url})`)
+              )
+              .join('\n')
           );
           // 完成后，关闭流
           controller.close();

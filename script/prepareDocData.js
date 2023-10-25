@@ -60,13 +60,13 @@ const prepareData = async () => {
   let subIndex = 1;
   for await (const item of list) {
     const points = [];
-    const lines = item.content.split('\n#');
+    const lines = item.content.split('\n## ');
     for await (const line of lines) {
       if (line.length < 10) {
         continue;
       }
 
-      console.log(item.content);
+      console.log(item.content.length);
       // 使用 fetch 发送 POST 请求，将文本行编码为向量
       const vector = await fetch('http://127.0.0.1:5000/encode', {
         method: 'POST',
@@ -102,12 +102,16 @@ const prepareData = async () => {
       continue;
     }
 
-    // 将点数据插入到集合中
-    await client.upsert(collectionName, {
-      points: points,
-    });
+    try {
+      await client.upsert(collectionName, {
+        points: points,
+      });
 
-    index++;
+      index++;
+    } catch (error) {
+      continue;
+    }
+    // 将点数据插入到集合中
   }
 };
 

@@ -60,25 +60,12 @@ export default function Home() {
 
   const query = async () => {
     const query = (document.getElementById('query') as HTMLInputElement).value;
-    const database = new URLSearchParams(window.location.search).get(
-      'database'
-    );
+    const database =
+      new URLSearchParams(window.location.search).get('database') || undefined;
     window.history.pushState({}, '', `?query=${query}&database=${database}`);
     if (!query) return;
     await fetchDataStream(query);
   };
-
-  const documentList = useMemo((): {
-    url: string;
-    text: string;
-  }[] => {
-    try {
-      const json = text.split('###################').at(1);
-      return json ? JSON.parse(json) : [];
-    } catch (error) {
-      return [];
-    }
-  }, [text]);
 
   return (
     <main
@@ -244,35 +231,8 @@ export default function Home() {
               >
                 <div>查询结果：</div>
                 <div>
-                  <Markdown>{text.split('###################').at(0)}</Markdown>
+                  <Markdown>{text}</Markdown>
                 </div>
-                {documentList.length ? (
-                  <>
-                    <div>参考文档：</div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 12,
-                      }}
-                    >
-                      {documentList?.map((item) => (
-                        <div key={item.text}>
-                          <a
-                            href={item.url}
-                            style={{
-                              color: 'rgb(9.4%,56.5%,85%)',
-                              cursor: 'pointer',
-                            }}
-                            target="_blank"
-                          >
-                            {item.url}
-                          </a>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : null}
               </div>
             )}
           </div>

@@ -11,14 +11,14 @@ export const config = {
 export default async function handler(req: any) {
   if (req.method === 'POST') {
     try {
-      const { query, database } = await req.json();
-
+      const database = req.nextUrl.searchParams.get('database');
+      const { messages } = await req.json();
       const content = await fetch('http://127.0.0.1:5000/query', {
         method: 'POST',
         body: JSON.stringify({
-          query,
+          query: messages?.at?.(-1)?.content,
           limit: 5,
-          database: database,
+          database: database || 'test_collection',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export default async function handler(req: any) {
               {
                 role: 'user',
                 content: `\n
-    问题："""${query}"""
+    问题："""${messages?.at?.(-1)?.content}"""
     答案:"""${JSON.stringify(content)}"""
     \
     基于以上的问题和答案总结一个得体并且完善的回答，只需要输出回答即可。
@@ -57,11 +57,12 @@ export default async function handler(req: any) {
 
           // 发送参考链接
           controller.enqueue(
-            encoder
-              .encode(
-                '\n' + content.map((item: any) => `[${item.url}](${item.url})`)
-              )
-              .join('\n')
+            encoder.encode(
+              '\n #### 参考文档 \n\n' +
+                content
+                  .map((item: any) => `* [${item.url}](${item.url})`)
+                  .join('\n')
+            )
           );
           // 完成后，关闭流
           controller.close();

@@ -34,9 +34,9 @@ export default async function handler(req: any) {
               {
                 role: 'user',
                 content: `问题："""${query}"""
-可能的答案:"""${JSON.stringify(content)}"""
+答案:"""${JSON.stringify(content)}"""
 
-基于以上的问题和可能的答案总结一个得体并且言简意骇的回答，只需要输出回答即可。
+基于以上的问题和可能的答案总结一个得体并且完善的回答，只需要输出回答即可。
                 `,
               },
             ],

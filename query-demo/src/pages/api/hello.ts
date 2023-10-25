@@ -34,9 +34,9 @@ export default async function handler(req: any) {
                 role: 'user',
                 content: `\n
     问题："""${query}"""
-    可能的答案:"""${JSON.stringify(content)}"""
+    答案:"""${JSON.stringify(content)}"""
     \n
-    基于以上的问题和可能的答案总结一个得体并且言简意骇的回答，只需要输出回答即可。
+    基于以上的问题和答案总结一个得体并且完善的回答，只需要输出回答即可。
     例如：
       > 在.umijs.js中无法使用require.context，因为.umijs.js不是在浏览器环境下运行，而是通过node的fs进行处理。
                 `,

@@ -64,7 +64,7 @@ def zongjie():
     messages = [
         {
             "role": "user",
-            "content": "将这段文案总结为一段言简意骇的内容，里面包含所有的信息，但是做了一些精简 \n\n "
+            "content": "将这段文案总结为一段完善的内容，里面包含所有的信息，但是做了一些精简 \n\n "
             + query["text"]
             + " \n\n",
         }
@@ -80,7 +80,7 @@ def query():
         return {"message": "query is required"}
 
     database = query_data["database"]
-    if database is None:
+    if database is None or database == "":
         database = "test_collection"
 
     limit = 10

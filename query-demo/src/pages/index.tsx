@@ -72,8 +72,12 @@ export default function Home() {
     url: string;
     text: string;
   }[] => {
-    const json = text.split('###################').at(1);
-    return json ? JSON.parse(json) : [];
+    try {
+      const json = text.split('###################').at(1);
+      return json ? JSON.parse(json) : [];
+    } catch (error) {
+      return [];
+    }
   }, [text]);
 
   return (

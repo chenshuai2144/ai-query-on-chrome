@@ -23,7 +23,6 @@ const md2json = (markdown) => {
       }
       text += item.content;
     });
-
     return json;
   } catch (error) {
     // 使用 # 号来做切分

@@ -1,4 +1,6 @@
 ﻿const fetch = require('node-fetch');
+const getAllMdList = require('./getAllMdList');
+const md2json = require('./mdToJson');
 
 // 导入 '@qdrant/js-client-rest' 包中的 QdrantClient
 const { QdrantClient } = require('@qdrant/js-client-rest');
@@ -58,12 +60,12 @@ const prepareData = async () => {
   let subIndex = 1;
   for await (const item of list) {
     const points = [];
-    const lines = md2json(item.content);
-    console.log(item.path);
+    const lines = item.content.split('\n###');
     for await (const line of lines) {
       if (line.length < 10) {
         continue;
       }
+
       // 使用 fetch 发送 POST 请求，将文本行编码为向量
       const vector = await fetch('http://127.0.0.1:5000/encode', {
         method: 'POST',
@@ -75,7 +77,15 @@ const prepareData = async () => {
         },
       })
         .then((res) => res.text())
-        .then((res) => eval(res));
+        .then((res) => {
+          try {
+            return eval(res);
+          } catch {
+            return null;
+          }
+        });
+      console.log('insert: ' + item.relayPath);
+      if (!vector) continue;
 
       // 将点的信息添加到 points 数组中
       points.push({

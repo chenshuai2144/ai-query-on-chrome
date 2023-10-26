@@ -23,6 +23,7 @@ export default function Home() {
         style={{
           display: 'flex',
           gap: 12,
+          zIndex: 999,
           alignItems: 'center',
           justifyContent: 'center',
           padding: 12,
@@ -34,7 +35,8 @@ export default function Home() {
         <div>
           模型：
           <Segmented
-            value={model}
+            value={database === 'yuque_collection' ? 'qwen' : model}
+            disabled={database === 'yuque_collection'}
             onChange={(e) => setModel(e.toString())}
             options={[
               {
@@ -60,6 +62,10 @@ export default function Home() {
               },
               {
                 label: '双百业务',
+                value: 'yuque_collection',
+              },
+              {
+                label: '官网业务',
                 value: 'docs_collection',
               },
             ]}
@@ -69,7 +75,7 @@ export default function Home() {
 
       <ProChat
         request={
-          model === 'qwen'
+          model === 'qwen' || database === 'yuque_collection'
             ? '/api/qwen?database=' + database
             : '/api/hello?database=' + database
         }
@@ -78,6 +84,7 @@ export default function Home() {
           title: 'miumiu',
           backgroundColor: token.colorPrimaryBg,
         }}
+        helloMessage="你好，我是小助手，有什么可以帮助你的吗？"
         assistantMeta={{
           avatar: '🤖',
           title: '小助手',

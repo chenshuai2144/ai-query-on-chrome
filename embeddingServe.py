@@ -91,10 +91,12 @@ def query():
         collection_name=database,
         query_vector=model.encode(query_data["query"]).tolist(),
         limit=limit,
+        score_threshold=8.0,
     )
     result_list = []
 
     for hit in hits:
+        print(hit)
         result_list.append(hit.model_dump()["payload"])
 
     return result_list

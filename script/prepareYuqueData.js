@@ -93,7 +93,7 @@ const prepareData = async () => {
         vector,
         payload: {
           text: line,
-          url: item.path,
+          url: item.path.split('.').at(0),
         },
       });
       subIndex++;

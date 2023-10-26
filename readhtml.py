@@ -18,6 +18,8 @@ for filename in os.listdir(directory):
             os.makedirs("yuque_docs", exist_ok=True)
             if not os.path.exists("yuque_docs" + "/" + filename + ".md"):
                 with open(
-                    "yuque_docs" + "/" + filename + ".md", "w", encoding="utf-8"
+                    "yuque_docs" + "/" + filename.replace(".html", "") + ".md",
+                    "w",
+                    encoding="utf-8",
                 ) as file:
                     file.write(markdown_text)

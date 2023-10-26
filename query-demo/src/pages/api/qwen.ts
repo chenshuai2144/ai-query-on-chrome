@@ -58,7 +58,7 @@ export default async function handler(req: any) {
               '\n ##### 参考文档 \n\n' +
                 content
                   .map((item: any) => {
-                    if (database !== 'test_collection') {
+                    if (database === 'docs_collection') {
                       const url = `https://antdigital.com/docs/${item.url
                         .split('/')
                         .at(-1)
@@ -67,6 +67,11 @@ export default async function handler(req: any) {
                         .split('_#_')
                         .join('/')}`;
                       return `* [${url}](${url})`;
+                    }
+                    if (database === 'yuque_collection') {
+                      return `https://yuque.antfin.com/${item.url
+                        .split('_')
+                        .join('/')}`;
                     }
                     return `* [${item.url}](${item.url})`;
                   })

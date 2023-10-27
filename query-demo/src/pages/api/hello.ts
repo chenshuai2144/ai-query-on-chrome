@@ -72,9 +72,10 @@ export default async function handler(req: any) {
                       return `* [${url}](${url})`;
                     }
                     if (database === 'yuque_collection') {
-                      return `https://yuque.antfin.com/${item.url
+                      const url = `https://yuque.antfin.com/${item.url
                         .split('_')
-                        .join('/')}`;
+                        .join('/')}`.replace('/yuque/docs/', '');
+                      return `* [${url}](${url})`;
                     }
                     return `* [${item.url}](${item.url})`;
                   })

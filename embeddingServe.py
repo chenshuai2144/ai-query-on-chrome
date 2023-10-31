@@ -3,6 +3,8 @@ from FlagEmbedding import FlagModel
 from qdrant_client import QdrantClient
 import jsonpickle
 import openai
+import datetime
+import uuid
 
 from modelscope.outputs import OutputKeys
 from modelscope.pipelines import pipeline
@@ -134,3 +136,15 @@ def fenci():
     result = p(documents=query["text"])
     print(result)
     return {"text": result[OutputKeys.TEXT]}
+
+
+@app.route("/write_md", methods=["POST"])
+def write_md():
+    query_json = request.json
+    current_date = datetime.date.today().strftime("%Y-%m-%d")
+    file_name = f"./smartqa/{current_date}_{uuid.uuid4()}.md"
+
+    with open(file_name, "w", encoding="utf-8") as file:
+        file.write(query_json["text"])
+
+    return {"success": True}

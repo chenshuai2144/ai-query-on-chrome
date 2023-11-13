@@ -52,33 +52,38 @@ export default async function handler(req: any) {
             );
           }
 
-          // 发送参考链接
-          controller.enqueue(
-            encoder.encode(
-              '\n ##### 参考文档 \n\n' +
-                content
-                  .map((item: any) => {
-                    if (database === 'docs_collection') {
-                      const url = `https://antdigital.com/docs/${item.url
-                        .split('/')
-                        .at(-1)
-                        .split('.')
-                        .at(0)
-                        .split('_#_')
-                        .join('/')}`;
-                      return `* [${url}](${url})`;
-                    }
-                    if (database === 'yuque_collection') {
-                      const url = `https://yuque.antfin.com/${item.url
-                        .split('_')
-                        .join('/')}`.replace('/yuque/docs/', '');
-                      return `* [${url}](${url})`;
-                    }
-                    return `* [${item.url}](${item.url})`;
-                  })
-                  .join('\n')
-            )
-          );
+          if (database !== 'faq_collection') {
+            // 发送参考链接
+            controller.enqueue(
+              encoder.encode(
+                '\n ##### 参考文档 \n\n' +
+                  content
+                    .map((item: any) => {
+                      if (database === 'docs_collection') {
+                        const url = `https://antdigital.com/docs/${item.url
+                          .split('/')
+                          .at(-1)
+                          .split('.')
+                          .at(0)
+                          .split('_#_')
+                          .join('/')}`;
+                        return `* [${url}](${url})`;
+                      }
+                      if (
+                        database === 'yuque_collection' ||
+                        database == 'yueyan_collection'
+                      ) {
+                        const url = `https://yuque.antfin.com/${item.url
+                          .split('_')
+                          .join('/')}`.replace('/yuque/docs/', '');
+                        return `* [${url}](${url})`;
+                      }
+                      return `* [${item.url}](${item.url})`;
+                    })
+                    .join('\n')
+              )
+            );
+          }
           // 完成后，关闭流
           controller.close();
         },

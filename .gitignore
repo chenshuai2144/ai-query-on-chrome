@@ -34,3 +34,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 __pycache__/
+yuque_docs
+yueyan_docs
+smartqa
+faq_docs

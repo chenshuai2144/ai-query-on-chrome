@@ -1,10 +1,5 @@
 ﻿import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  baseURL: 'http://localhost:8000/v1',
-  apiKey: 'none',
-});
-
 export const config = {
   runtime: 'edge',
 };

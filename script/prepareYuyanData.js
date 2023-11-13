@@ -10,7 +10,7 @@ const client = new QdrantClient({ url: 'http://127.0.0.1:6333' });
 
 // 准备数据的函数
 const prepareData = async () => {
-  const collectionName = 'yuque_collection';
+  const collectionName = 'yueyan_collection';
 
   // 获取已存在的集合列表
   let result = await client.getCollections();
@@ -55,7 +55,7 @@ const prepareData = async () => {
   });
 
   // 获取所有的 Markdown 文件列表
-  const list = getAllMdList('yuque_docs');
+  const list = getAllMdList('yueyan_docs');
   let index = 0;
   let subIndex = 1;
   for await (const item of list) {

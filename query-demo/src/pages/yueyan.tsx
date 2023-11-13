@@ -16,13 +16,13 @@ export default function Home() {
       }}
     >
       <ProChat
-        request={'/api/qwen?database=faq_collection'}
+        request={'/api/qwen?database=yueyan_collection'}
         userMeta={{
           avatar: '🐱',
           title: 'miumiu',
           backgroundColor: token.colorPrimaryBg,
         }}
-        helloMessage="你好，我是双百小助手，有什么可以帮助你的吗？"
+        helloMessage="你好，我是玥妍小助手，有什么可以帮助你的吗？"
         assistantMeta={{
           avatar: '🤖',
           title: '小助手',

@@ -1,6 +1,7 @@
-﻿import { ProChat } from '@ant-design/pro-chat';
-import { Button, Input, message, theme } from 'antd';
+﻿import { Button, Input, message, theme } from 'antd';
 import { useState } from 'react';
+
+const utf8Decoder = new TextDecoder('utf-8');
 
 export default function Home() {
   const [text, setText] = useState('');
@@ -38,10 +39,16 @@ export default function Home() {
           onChange={(e) => setTitle(e.target.value)}
           placeholder="请输入问题"
           onSearch={(value) => {
-            if (!value || value.length < 10) {
+            setText('');
+            if (!value) {
               message.warning('请输入问题');
               return;
             }
+            if (value.length < 5) {
+              message.warning('问题不能少于5个字');
+              return;
+            }
+            let tempText = '';
             setLoading(true);
             fetch('/api/qwen?database=yuque_collection', {
               method: 'POST',
@@ -53,7 +60,33 @@ export default function Home() {
                   },
                 ],
               }),
-            }).then((res) => {});
+            }).then((response) => {
+              const reader = response?.body?.getReader();
+
+              return reader?.read().then(async function process({
+                done,
+                value: chunk,
+              }): Promise<any> {
+                if (done) {
+                  console.log('Stream finished');
+                  setLoading(false);
+                  return;
+                }
+                setText((responseText) => {
+                  return (
+                    responseText + utf8Decoder.decode(chunk, { stream: true })
+                  );
+                });
+
+                tempText += utf8Decoder.decode(chunk, { stream: true });
+                console.log(
+                  'Received data chunk',
+                  utf8Decoder.decode(chunk, { stream: true })
+                );
+
+                return reader.read().then(process);
+              });
+            });
           }}
         />
         <Input.TextArea
@@ -71,7 +104,7 @@ export default function Home() {
           }}
           size="large"
           type="primary"
-          disabled={loading || title.length < 10 || text.length < 20}
+          disabled={loading || title.length < 5 || text.length < 20}
           onClick={() => {
             fetch('/api/save', {
               method: 'POST',
@@ -79,6 +112,10 @@ export default function Home() {
                 text: `## ${title}
 ${text}`,
               }),
+            }).then((res) => {
+              message.success('保存成功');
+              setText('');
+              setTitle('');
             });
           }}
         >

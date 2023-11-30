@@ -1,7 +1,6 @@
 ﻿const fetch = require('node-fetch');
 const getAllMdList = require('./getAllMdList');
 const md2json = require('./mdToJson');
-
 // 导入 '@qdrant/js-client-rest' 包中的 QdrantClient
 const { QdrantClient } = require('@qdrant/js-client-rest');
 
@@ -60,18 +59,17 @@ const prepareData = async () => {
   let subIndex = 1;
   for await (const item of list) {
     const points = [];
-    const lines = item.content.split('\n# ');
+    const lines = md2json(item.content);
     for await (const line of lines) {
-      if (line.length < 10) {
+      if (!line.text || !line.header) {
         continue;
       }
 
-      console.log(item.content.length);
       // 使用 fetch 发送 POST 请求，将文本行编码为向量
       const vector = await fetch('http://127.0.0.1:5000/encode', {
         method: 'POST',
         body: JSON.stringify({
-          text: line,
+          text: line.header + line.text,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +90,7 @@ const prepareData = async () => {
         id: index * 10 + subIndex,
         vector,
         payload: {
-          text: line,
+          text: line.header + line.text,
           url: item.path.split('.').at(0),
         },
       });

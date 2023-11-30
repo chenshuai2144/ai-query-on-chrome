@@ -98,10 +98,40 @@ def query():
     result_list = []
 
     for hit in hits:
-        print(hit)
+        
         result_list.append(hit.model_dump()["payload"])
 
     return result_list
+
+@app.route("/queryScore", methods=["POST"])
+def queryScore():
+    query_data = request.json
+
+    if "query" not in query_data:
+        return {"message": "query is required"}
+
+    database = query_data["database"]
+    if database is None or database == "":
+        database = "test_collection"
+
+    limit = 10
+    if "limit" in query_data:
+        limit = query_data["limit"]
+
+    hits = client.search(
+        collection_name=database,
+        query_vector=model.encode(query_data["query"]).tolist(),
+        limit=limit,
+        score_threshold=8.0,
+    )
+    result_list = []
+
+    for hit in hits:
+        
+        result_list.append(hit.model_dump())
+
+    return result_list
+
 
 
 @app.route("/answer", methods=["POST"])

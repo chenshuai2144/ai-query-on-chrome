@@ -12,10 +12,16 @@ const md2json = (markdown) => {
     var result = md.parse(markdown, {});
     let json = [];
     let text = '';
+    let header = '';
     result.forEach((item) => {
-      if (item.type === 'heading_open' && !text) {
+      if (item.type === 'heading_close') {
+        header = text;
+        text = '';
+        return;
+      }
+      if (item.type === 'heading_open') {
         json.push({
-          header: item.content,
+          header,
           text,
         });
         text = '';

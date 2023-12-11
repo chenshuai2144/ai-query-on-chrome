@@ -10,10 +10,9 @@ json_dict = json_data.split("\n")
 
 client = chromadb.Client()
 
-model = FlagModel(
-    "BAAI/bge-base-zh", query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章："
-)
-
+model = FlagModel('BAAI/bge-large-zh-v1.5', 
+                  query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章：",
+                  use_fp16=True)
 
 collection = client.create_collection("pro-table")
 index = 0

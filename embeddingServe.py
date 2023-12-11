@@ -40,7 +40,7 @@ def call_qwen(messages, functions=None):
 
 
 model = FlagModel(
-    "BAAI/bge-large-zh-v1.5", query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章："
+    "BAAI/bge-large-zh", query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章："
 )
 
 client = QdrantClient(url="http://localhost:6333")

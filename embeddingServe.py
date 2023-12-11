@@ -6,14 +6,6 @@ import openai
 import datetime
 import uuid
 
-from modelscope.outputs import OutputKeys
-from modelscope.pipelines import pipeline
-from modelscope.utils.constant import Tasks
-
-p = pipeline(
-    task=Tasks.document_segmentation,
-    model="damo/nlp_bert_document-segmentation_chinese-base",
-)
 
 # To start an OpenAI-like Qwen server, use the following commands:
 #   git clone https://github.com/QwenLM/Qwen-7B;
@@ -158,14 +150,6 @@ def answer():
     ]
     return call_qwen(messages)
 
-
-@app.route("/fenci", methods=["POST"])
-def fenci():
-    query = request.json
-
-    result = p(documents=query["text"])
-    print(result)
-    return {"text": result[OutputKeys.TEXT]}
 
 
 @app.route("/write_md", methods=["POST"])

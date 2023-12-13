@@ -55,7 +55,7 @@ const prepareData = async () => {
   });
 
   // 获取所有的 Markdown 文件列表
-  const list = getAllMdList();
+  const list = getAllMdList(join(__dirname, '..', 'docs'));
   let index = 0;
   let subIndex = 1;
   for await (const item of list) {

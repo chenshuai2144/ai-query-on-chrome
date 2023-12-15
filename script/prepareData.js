@@ -80,7 +80,7 @@ const prepareData = async () => {
         .then((res) => res.text())
         .then((res) => {
           try {
-            return eval(res);
+            return eval(res)[0];
           } catch {
             return null;
           }

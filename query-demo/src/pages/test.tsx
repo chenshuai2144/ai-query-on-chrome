@@ -61,7 +61,7 @@ export default function Home() {
                 value: 'test_collection',
               },
               {
-                label: '双百业务',
+                label: '业务',
                 value: 'yuque_collection',
               },
               {

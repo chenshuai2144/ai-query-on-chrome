@@ -6,7 +6,7 @@ const md2json = require('./mdToJson');
 const { QdrantClient } = require('@qdrant/js-client-rest');
 
 // 连接到本地运行的 Qdrant
-const client = new QdrantClient({ url: 'http://127.0.0.1:6333' });
+const client = new QdrantClient({ url: 'http://172.17.0.3:6333' });
 
 // 准备数据的函数
 const prepareData = async () => {

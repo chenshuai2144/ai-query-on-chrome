@@ -1,5 +1,5 @@
 ﻿from flask import Flask, request
-from FlagEmbedding import FlagModel
+from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 import jsonpickle
 import openai
@@ -31,9 +31,7 @@ def call_qwen(messages, functions=None):
     return response.choices[0].message.content
 
 
-model = FlagModel('BAAI/bge-large-zh-v1.5', 
-                  query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章：",
-                  use_fp16=True)
+model = SentenceTransformer('BAAI/bge-large-zh-v1.5',cache_folder="D://hub/")
 
 client = QdrantClient(url="http://localhost:6333")
 
@@ -49,7 +47,7 @@ def hello_world():
 @app.route("/encode", methods=["POST"])
 def encode():
     content = request.json
-    return model.encode(content["text"]).tolist()
+    return model.encode([content["text"]]).tolist()
 
 
 @app.route("/zongjie", methods=["POST"])

@@ -1,12 +1,13 @@
 ﻿const fetch = require('node-fetch');
 const getAllMdList = require('./getAllMdList');
 const md2json = require('./mdToJson');
+const { join } = require('path');
 
 // 导入 '@qdrant/js-client-rest' 包中的 QdrantClient
 const { QdrantClient } = require('@qdrant/js-client-rest');
 
 // 连接到本地运行的 Qdrant
-const client = new QdrantClient({ url: 'http://172.17.0.3:6333' });
+const client = new QdrantClient({ url: 'http://127.0.0.1:6333' });
 
 // 准备数据的函数
 const prepareData = async () => {
@@ -60,9 +61,9 @@ const prepareData = async () => {
   let subIndex = 1;
   for await (const item of list) {
     const points = [];
-    const lines = item.content.split('\n###');
+    const lines = md2json(item.content);
     for await (const line of lines) {
-      if (line.length < 10) {
+      if (line.header.length < 10) {
         continue;
       }
 
@@ -70,7 +71,7 @@ const prepareData = async () => {
       const vector = await fetch('http://127.0.0.1:5000/encode', {
         method: 'POST',
         body: JSON.stringify({
-          text: line,
+          text: '## ' + line.header + '\n\n' + line.text,
         }),
         headers: {
           'Content-Type': 'application/json',

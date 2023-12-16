@@ -81,7 +81,7 @@ def query():
 
     hits = client.search(
         collection_name=database,
-        query_vector=model.encode(query_data["query"]).tolist().index(0),
+        query_vector=model.encode(query_data["query"]).tolist(),
         limit=limit,
         score_threshold=8.0,
     )

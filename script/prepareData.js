@@ -7,7 +7,7 @@ const { join } = require('path');
 const { QdrantClient } = require('@qdrant/js-client-rest');
 
 // 连接到本地运行的 Qdrant
-const client = new QdrantClient({ url: 'http://172.17.0.3:6333' });
+const client = new QdrantClient({ url: 'http://127.0.0.1:6333' });
 
 // 准备数据的函数
 const prepareData = async () => {
@@ -56,14 +56,15 @@ const prepareData = async () => {
   });
 
   // 获取所有的 Markdown 文件列表
-  const list = getAllMdList(join(__dirname, '..', 'docs'));
+  const list = getAllMdList(join('docs'));
   let index = 0;
   let subIndex = 1;
+
   for await (const item of list) {
     const points = [];
-    const lines = md2json(item.content);
+    const lines = item.content.split('##');
     for await (const line of lines) {
-      if (line.header.length < 10) {
+      if (!line) {
         continue;
       }
 
@@ -71,7 +72,7 @@ const prepareData = async () => {
       const vector = await fetch('http://127.0.0.1:5000/encode', {
         method: 'POST',
         body: JSON.stringify({
-          text: '## ' + line.header + '\n\n' + line.text,
+          text: '## ' + line,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +94,7 @@ const prepareData = async () => {
         id: index * 10 + subIndex,
         vector,
         payload: {
-          text: line,
+          text: '## ' + line,
           url: item.path,
         },
       });

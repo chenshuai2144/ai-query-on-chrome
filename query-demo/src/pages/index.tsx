@@ -1,5 +1,6 @@
 ﻿import { AutoComplete, Button, Input, Select, message, theme } from 'antd';
 import { useState } from 'react';
+import MarkDown from 'react-markdown';
 
 const utf8Decoder = new TextDecoder('utf-8');
 
@@ -164,7 +165,7 @@ export default function Home() {
             minHeight: '400px',
           }}
         >
-          {text}
+          <MarkDown>{text}</MarkDown>
         </div>
       </div>
     </main>

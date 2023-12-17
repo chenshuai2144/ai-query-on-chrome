@@ -1,4 +1,4 @@
-﻿import { Button, Input, Select, message, theme } from 'antd';
+﻿import { AutoComplete, Button, Input, Select, message, theme } from 'antd';
 import { useState } from 'react';
 
 const utf8Decoder = new TextDecoder('utf-8');
@@ -33,7 +33,7 @@ export default function Home() {
           boxSizing: 'border-box',
         }}
       >
-        <Select
+        <AutoComplete
           disabled={loading}
           size="large"
           style={{
@@ -105,7 +105,60 @@ export default function Home() {
               });
             });
           }}
-        />
+        >
+          <Input.Search
+            onSearch={(value) => {
+              setText('');
+              if (!value) {
+                message.warning('请输入问题');
+                return;
+              }
+              if (value.length < 5) {
+                message.warning('问题不能少于5个字');
+                return;
+              }
+              let tempText = '';
+              setLoading(true);
+              fetch('/api/qwen?database=yuque_collection', {
+                method: 'POST',
+                body: JSON.stringify({
+                  messages: [
+                    {
+                      content: value,
+                      role: 'user',
+                    },
+                  ],
+                }),
+              }).then((response) => {
+                const reader = response?.body?.getReader();
+
+                return reader?.read().then(async function process({
+                  done,
+                  value: chunk,
+                }): Promise<any> {
+                  if (done) {
+                    console.log('Stream finished');
+                    setLoading(false);
+                    return;
+                  }
+                  setText((responseText) => {
+                    return (
+                      responseText + utf8Decoder.decode(chunk, { stream: true })
+                    );
+                  });
+
+                  tempText += utf8Decoder.decode(chunk, { stream: true });
+                  console.log(
+                    'Received data chunk',
+                    utf8Decoder.decode(chunk, { stream: true })
+                  );
+
+                  return reader.read().then(process);
+                });
+              });
+            }}
+          />
+        </AutoComplete>
         <div
           style={{
             minHeight: '400px',

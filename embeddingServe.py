@@ -56,9 +56,7 @@ def zongjie():
     messages = [
         {
             "role": "user",
-            "content": "将这段文案总结为一段完善的内容，里面包含所有的信息，但是做了一些精简 \n\n "
-            + query["text"]
-            + " \n\n",
+            "content":query['message']
         }
     ]
     return call_qwen(messages)
@@ -127,23 +125,10 @@ def queryScore():
 @app.route("/answer", methods=["POST"])
 def answer():
     query = request.json
-    print(
-        "问题："
-        + query["query"]
-        + "\n"
-        + "可能的原因"
-        + jsonpickle.encode(query["answer"])
-        + "\n\n 请基于以上的内容总结一个回答",
-    )
     messages = [
         {
             "role": "user",
-            "content": "问题："
-            + query["query"]
-            + "\n"
-            + "可能的原因"
-            + jsonpickle.encode(query["answer"])
-            + "\n\n 请基于以上的内容总结一个回答",
+            "content": query['message']
         }
     ]
     return call_qwen(messages)
